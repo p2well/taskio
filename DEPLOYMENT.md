@@ -50,13 +50,12 @@
    - Go to [render.com](https://render.com)
    - Click "New +" → "Web Service"
    - Connect your `taskio-backend` repository
-   - Render will detect `render.yaml`
+   - Render will automatically detect `render.yaml` and `Dockerfile`
    - Or configure manually:
      - **Name**: taskio-backend
-     - **Runtime**: Java
-     - **Build Command**: `mvn clean install -DskipTests`
-     - **Start Command**: `java -jar target/taskio-backend-1.0.0.jar`
+     - **Runtime**: Docker
      - **Instance Type**: Free
+     - Dockerfile will handle build and run automatically
 
 3. **Add Environment Variables** in Render:
    - `SPRING_PROFILES_ACTIVE`: `prod`
