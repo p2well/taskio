@@ -49,7 +49,7 @@ export default function TaskItem({ task, onUpdate, onDelete, onEdit }: TaskItemP
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return null;
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString("en-GB", {
       year: "numeric",
       month: "short",
       day: "numeric",
