@@ -7,6 +7,7 @@ export interface SearchFilters {
   status?: TaskStatus;
   startDate?: string;
   endDate?: string;
+  category?: string;
 }
 
 export class ApiClient {
@@ -61,10 +62,19 @@ export class ApiClient {
       params.append("endDate", filters.endDate);
     }
     
+    if (filters.category?.trim()) {
+      params.append("category", filters.category.trim());
+    }
+    
     const queryString = params.toString();
     const url = `${API_BASE_URL}/tasks/search${queryString ? `?${queryString}` : ""}`;
     
     const response = await this.fetchWithErrorHandling(url);
+    return response.json();
+  }
+
+  static async getAllCategories(): Promise<string[]> {
+    const response = await this.fetchWithErrorHandling(`${API_BASE_URL}/tasks/categories`);
     return response.json();
   }
 

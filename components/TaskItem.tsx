@@ -2,7 +2,7 @@
 
 import { Task, TaskStatus } from "@/types/task";
 import { useState } from "react";
-import { CalendarIcon, PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { CalendarIcon, PencilSquareIcon, TrashIcon, TagIcon } from "@heroicons/react/24/outline";
 
 interface TaskItemProps {
   task: Task;
@@ -83,6 +83,13 @@ export default function TaskItem({ task, onUpdate, onDelete, onEdit }: TaskItemP
               <span className="text-xs text-gray-700 dark:text-gray-300 font-semibold flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 px-3 py-1.5 rounded-full border border-gray-300 dark:border-gray-600">
                 <CalendarIcon className="w-4 h-4 stroke-2" />
                 {formatDate(task.dueDate)}
+              </span>
+            )}
+
+            {task.category && (
+              <span className="text-xs text-purple-700 dark:text-purple-300 font-semibold bg-purple-100 dark:bg-purple-900/30 px-3 py-1.5 rounded-full border border-purple-300 dark:border-purple-600 flex items-center gap-1.5">
+                <TagIcon className="w-4 h-4 stroke-2" />
+                {task.category}
               </span>
             )}
           </div>

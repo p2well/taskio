@@ -11,14 +11,17 @@ export interface SearchFilterProps {
     status?: TaskStatus;
     startDate?: string;
     endDate?: string;
+    category?: string;
   }) => void;
+  categories?: string[];
 }
 
-export default function SearchFilter({ onSearch }: SearchFilterProps) {
+export default function SearchFilter({ onSearch, categories = [] }: SearchFilterProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [status, setStatus] = useState<TaskStatus | "">("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [category, setCategory] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const handleSearch = () => {
@@ -27,6 +30,7 @@ export default function SearchFilter({ onSearch }: SearchFilterProps) {
       status: status || undefined,
       startDate: startDate || undefined,
       endDate: endDate || undefined,
+      category: category || undefined,
     });
   };
 
@@ -35,15 +39,17 @@ export default function SearchFilter({ onSearch }: SearchFilterProps) {
     setStatus("");
     setStartDate("");
     setEndDate("");
+    setCategory("");
     onSearch({
       searchTerm: "",
       status: undefined,
       startDate: undefined,
       endDate: undefined,
+      category: undefined,
     });
   };
 
-  const hasActiveFilters = searchTerm || status || startDate || endDate;
+  const hasActiveFilters = searchTerm || status || startDate || endDate || category;
 
   return (
     <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md border border-purple-100 dark:border-gray-700">
@@ -85,7 +91,7 @@ export default function SearchFilter({ onSearch }: SearchFilterProps) {
       {/* Advanced Filters */}
       {showAdvanced && (
         <div className="mt-4 pt-4 border-t-2 border-gray-100 dark:border-gray-700">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Status Filter */}
             <div className="flex flex-col">
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
@@ -100,6 +106,25 @@ export default function SearchFilter({ onSearch }: SearchFilterProps) {
                 <option value="TODO">To Do</option>
                 <option value="IN_PROGRESS">In Progress</option>
                 <option value="DONE">Done</option>
+              </select>
+            </div>
+
+            {/* Category Filter */}
+            <div className="flex flex-col">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Category
+              </label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full h-[42px] px-4 py-2 bg-gray-50 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 dark:text-gray-200 cursor-pointer"
+              >
+                <option value="">All Categories</option>
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
               </select>
             </div>
 

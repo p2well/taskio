@@ -6,6 +6,7 @@ export interface Task {
   description?: string;
   status: TaskStatus;
   dueDate?: string;
+  category?: string;
 }
 
 export interface ApiError {

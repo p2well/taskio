@@ -6,24 +6,27 @@ import { ApiClient, SearchFilters } from "@/lib/api-client";
 import TaskList from "@/components/TaskList";
 import TaskForm from "@/components/TaskForm";
 import SearchFilter from "@/components/SearchFilter";
-import { ClipboardDocumentCheckIcon, PlusIcon, ChartBarIcon, XCircleIcon, ArrowPathIcon, PencilIcon, DocumentTextIcon, MoonIcon, SunIcon } from "@heroicons/react/24/outline";
+import { ClipboardDocumentCheckIcon, PlusIcon, ChartBarIcon, XCircleIcon, ArrowPathIcon, PencilIcon, DocumentTextIcon, MoonIcon, SunIcon, TagIcon, ArchiveBoxIcon } from "@heroicons/react/24/outline";
 import { useTheme } from "@/contexts/ThemeContext";
 
-type SortOption = "status" | "dueDate" | "none";
+type SortOption = "status" | "dueDate" | "category" | "none";
 
 export default function Home() {
   const { theme, toggleTheme } = useTheme();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>("none");
   const [activeFilters, setActiveFilters] = useState<SearchFilters>({});
+  const [groupByCategory, setGroupByCategory] = useState(false);
 
   useEffect(() => {
     loadTasks();
+    loadCategories();
   }, []);
 
   useEffect(() => {
@@ -48,6 +51,15 @@ export default function Home() {
     }
   };
 
+  const loadCategories = async () => {
+    try {
+      const data = await ApiClient.getAllCategories();
+      setCategories(data);
+    } catch (err) {
+      console.error("Failed to load categories:", err);
+    }
+  };
+
   const handleSearch = (filters: SearchFilters) => {
     loadTasks(filters);
   };
@@ -68,6 +80,12 @@ export default function Home() {
         if (!b.dueDate) return -1;
         return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
       });
+    } else if (sortBy === "category") {
+      sorted.sort((a, b) => {
+        const catA = a.category || "Uncategorized";
+        const catB = b.category || "Uncategorized";
+        return catA.localeCompare(catB);
+      });
     }
     
     setFilteredTasks(sorted);
@@ -77,6 +95,7 @@ export default function Home() {
     try {
       await ApiClient.createTask(task);
       await loadTasks(Object.keys(activeFilters).length > 0 ? activeFilters : undefined);
+      await loadCategories();
       setShowForm(false);
     } catch (err) {
       throw err;
@@ -87,6 +106,7 @@ export default function Home() {
     try {
       await ApiClient.updateTask(id, task);
       await loadTasks(Object.keys(activeFilters).length > 0 ? activeFilters : undefined);
+      await loadCategories();
       setEditingTask(null);
     } catch (err) {
       throw err;
@@ -150,26 +170,41 @@ export default function Home() {
 
         {/* Search and Filter */}
         <div className="mb-6">
-          <SearchFilter onSearch={handleSearch} />
+          <SearchFilter onSearch={handleSearch} categories={categories} />
         </div>
 
         {/* Controls */}
         <div className="mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md">
-          <div className="flex items-center gap-3">
-            <ChartBarIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-            <label htmlFor="sort" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              Sort by:
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-3">
+              <ChartBarIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+              <label htmlFor="sort" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                Sort by:
+              </label>
+              <select
+                id="sort"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as SortOption)}
+                className="px-4 py-2 bg-gray-100 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm font-medium text-gray-700 dark:text-gray-200 cursor-pointer hover:border-purple-300 dark:hover:border-purple-500 transition-all"
+              >
+                <option value="none">None</option>
+                <option value="status">Status</option>
+                <option value="dueDate">Due Date</option>
+                <option value="category">Category</option>
+              </select>
+            </div>
+            
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={groupByCategory}
+                onChange={(e) => setGroupByCategory(e.target.checked)}
+                className="w-4 h-4 text-purple-600 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-purple-500"
+              />
+              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                Group by Category
+              </span>
             </label>
-            <select
-              id="sort"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as SortOption)}
-              className="px-4 py-2 bg-gray-100 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm font-medium text-gray-700 dark:text-gray-200 cursor-pointer hover:border-purple-300 dark:hover:border-purple-500 transition-all"
-            >
-              <option value="none">None</option>
-              <option value="status">Status</option>
-              <option value="dueDate">Due Date</option>
-            </select>
           </div>
 
           <button
@@ -225,6 +260,42 @@ export default function Home() {
               {loading ? (
                 <div className="flex justify-center items-center py-12">
                   <ArrowPathIcon className="h-12 w-12 text-purple-600 dark:text-purple-400 animate-spin" />
+                </div>
+              ) : groupByCategory ? (
+                <div className="space-y-6">
+                  {(() => {
+                    const grouped = filteredTasks.reduce((acc, task) => {
+                      const cat = task.category || "Uncategorized";
+                      if (!acc[cat]) acc[cat] = [];
+                      acc[cat].push(task);
+                      return acc;
+                    }, {} as Record<string, Task[]>);
+                    
+                    return Object.entries(grouped).sort(([a], [b]) => {
+                      if (a === "Uncategorized") return 1;
+                      if (b === "Uncategorized") return -1;
+                      return a.localeCompare(b);
+                    }).map(([category, categoryTasks]) => (
+                      <div key={category}>
+                        <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-3 flex items-center gap-2">
+                          <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-sm border border-purple-300 dark:border-purple-600 flex items-center gap-1.5">
+                            {category === "Uncategorized" ? (
+                              <ArchiveBoxIcon className="w-4 h-4 stroke-2" />
+                            ) : (
+                              <TagIcon className="w-4 h-4 stroke-2" />
+                            )}
+                            {category} ({categoryTasks.length})
+                          </span>
+                        </h3>
+                        <TaskList
+                          tasks={categoryTasks}
+                          onUpdate={handleUpdateTask}
+                          onDelete={handleDeleteTask}
+                          onEdit={handleEditTask}
+                        />
+                      </div>
+                    ));
+                  })()}
                 </div>
               ) : (
                 <TaskList

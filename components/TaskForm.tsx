@@ -15,6 +15,7 @@ export default function TaskForm({ initialTask, onSubmit, onCancel }: TaskFormPr
   const [description, setDescription] = useState(initialTask?.description || "");
   const [status, setStatus] = useState<TaskStatus>(initialTask?.status || "TODO");
   const [dueDate, setDueDate] = useState(initialTask?.dueDate || "");
+  const [category, setCategory] = useState(initialTask?.category || "");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -29,6 +30,10 @@ export default function TaskForm({ initialTask, onSubmit, onCancel }: TaskFormPr
 
     if (description && description.length > 500) {
       newErrors.description = "Description must not exceed 500 characters";
+    }
+
+    if (category && category.length > 50) {
+      newErrors.category = "Category must not exceed 50 characters";
     }
 
     // Note: Due date validation is handled by the DatePicker component
@@ -50,6 +55,7 @@ export default function TaskForm({ initialTask, onSubmit, onCancel }: TaskFormPr
         description: description.trim() || undefined,
         status,
         dueDate: dueDate || undefined,
+        category: category.trim() || undefined,
       });
       
       // Reset form if creating new task
@@ -58,6 +64,7 @@ export default function TaskForm({ initialTask, onSubmit, onCancel }: TaskFormPr
         setDescription("");
         setStatus("TODO");
         setDueDate("");
+        setCategory("");
       }
     } catch (error) {
       setErrors({ submit: error instanceof Error ? error.message : "Failed to save task" });
@@ -120,6 +127,25 @@ export default function TaskForm({ initialTask, onSubmit, onCancel }: TaskFormPr
           <option value="IN_PROGRESS">In Progress</option>
           <option value="DONE">Done</option>
         </select>
+      </div>
+
+      <div>
+        <label htmlFor="category" className="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
+          Category
+        </label>
+        <input
+          type="text"
+          id="category"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className={`w-full px-4 py-3 text-gray-900 dark:text-gray-100 text-base font-medium border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-500 focus:border-purple-500 transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500 placeholder:font-normal ${
+            errors.category ? "border-red-400 bg-red-50 dark:bg-red-900/20" : "border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 hover:bg-white dark:hover:bg-gray-600 hover:border-purple-300 dark:hover:border-purple-500"
+          }`}
+          maxLength={50}
+          placeholder="e.g., Work, Personal, Shopping..."
+        />
+        {errors.category && <p className="mt-2 text-sm text-red-600 font-medium">{errors.category}</p>}
+        {category && <p className="mt-1 text-xs text-gray-600 font-medium">{category.length}/50 characters</p>}
       </div>
 
       <div>
