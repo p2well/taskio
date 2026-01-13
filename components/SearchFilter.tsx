@@ -87,14 +87,14 @@ export default function SearchFilter({ onSearch }: SearchFilterProps) {
         <div className="mt-4 pt-4 border-t-2 border-gray-100 dark:border-gray-700">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Status Filter */}
-            <div>
+            <div className="flex flex-col">
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                 Status
               </label>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as TaskStatus | "")}
-                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 dark:text-gray-200 cursor-pointer"
+                className="w-full h-[42px] px-4 py-2 bg-gray-50 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 dark:text-gray-200 cursor-pointer"
               >
                 <option value="">All Statuses</option>
                 <option value="TODO">To Do</option>
@@ -104,7 +104,7 @@ export default function SearchFilter({ onSearch }: SearchFilterProps) {
             </div>
 
             {/* Start Date Filter */}
-            <div>
+            <div className="flex flex-col">
               <label htmlFor="startDate" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                 Due Date From
               </label>
@@ -112,12 +112,12 @@ export default function SearchFilter({ onSearch }: SearchFilterProps) {
                 id="startDate"
                 value={startDate}
                 onChange={setStartDate}
-                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 dark:text-gray-200 cursor-pointer"
+                className="w-full h-[42px] px-4 py-2 bg-gray-50 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 dark:text-gray-200 cursor-pointer"
               />
             </div>
 
             {/* End Date Filter */}
-            <div>
+            <div className="flex flex-col">
               <label htmlFor="endDate" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                 Due Date To
               </label>
@@ -125,7 +125,7 @@ export default function SearchFilter({ onSearch }: SearchFilterProps) {
                 id="endDate"
                 value={endDate}
                 onChange={setEndDate}
-                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 dark:text-gray-200 cursor-pointer"
+                className="w-full h-[42px] px-4 py-2 bg-gray-50 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 dark:text-gray-200 cursor-pointer"
               />
             </div>
           </div>
