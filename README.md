@@ -36,6 +36,14 @@ A professional, full-stack task management application built with Next.js and Sp
 - H2 Database
 - Maven
 
+## Development
+
+This project was developed with assistance from **GitHub Copilot**, an AI-powered pair programmer. AI assistance was used for:
+- Code generation and implementation
+- Architecture design and best practices
+- Testing and debugging
+- Documentation
+
 ## Getting Started
 
 ### Prerequisites
