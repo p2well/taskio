@@ -1,6 +1,13 @@
-import { Task } from "@/types/task";
+import { Task, TaskStatus } from "@/types/task";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
+
+export interface SearchFilters {
+  searchTerm?: string;
+  status?: TaskStatus;
+  startDate?: string;
+  endDate?: string;
+}
 
 export class ApiClient {
   private static async fetchWithErrorHandling(
@@ -32,6 +39,32 @@ export class ApiClient {
 
   static async getAllTasks(): Promise<Task[]> {
     const response = await this.fetchWithErrorHandling(`${API_BASE_URL}/tasks`);
+    return response.json();
+  }
+
+  static async searchAndFilterTasks(filters: SearchFilters): Promise<Task[]> {
+    const params = new URLSearchParams();
+    
+    if (filters.searchTerm?.trim()) {
+      params.append("q", filters.searchTerm.trim());
+    }
+    
+    if (filters.status) {
+      params.append("status", filters.status);
+    }
+    
+    if (filters.startDate) {
+      params.append("startDate", filters.startDate);
+    }
+    
+    if (filters.endDate) {
+      params.append("endDate", filters.endDate);
+    }
+    
+    const queryString = params.toString();
+    const url = `${API_BASE_URL}/tasks/search${queryString ? `?${queryString}` : ""}`;
+    
+    const response = await this.fetchWithErrorHandling(url);
     return response.json();
   }
 

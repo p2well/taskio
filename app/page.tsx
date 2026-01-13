@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { Task, TaskStatus } from "@/types/task";
-import { ApiClient } from "@/lib/api-client";
+import { ApiClient, SearchFilters } from "@/lib/api-client";
 import TaskList from "@/components/TaskList";
 import TaskForm from "@/components/TaskForm";
+import SearchFilter from "@/components/SearchFilter";
 import { ClipboardDocumentCheckIcon, PlusIcon, ChartBarIcon, XCircleIcon, ArrowPathIcon, PencilIcon, DocumentTextIcon, MoonIcon, SunIcon } from "@heroicons/react/24/outline";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -19,6 +20,7 @@ export default function Home() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>("none");
+  const [activeFilters, setActiveFilters] = useState<SearchFilters>({});
 
   useEffect(() => {
     loadTasks();
@@ -28,17 +30,26 @@ export default function Home() {
     sortTasks();
   }, [tasks, sortBy]);
 
-  const loadTasks = async () => {
+  const loadTasks = async (filters?: SearchFilters) => {
     try {
       setLoading(true);
       setError(null);
-      const data = await ApiClient.getAllTasks();
+      const data = filters 
+        ? await ApiClient.searchAndFilterTasks(filters)
+        : await ApiClient.getAllTasks();
       setTasks(data);
+      if (filters) {
+        setActiveFilters(filters);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load tasks");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSearch = (filters: SearchFilters) => {
+    loadTasks(filters);
   };
 
   const sortTasks = () => {
@@ -65,7 +76,7 @@ export default function Home() {
   const handleCreateTask = async (task: Omit<Task, "id">) => {
     try {
       await ApiClient.createTask(task);
-      await loadTasks();
+      await loadTasks(Object.keys(activeFilters).length > 0 ? activeFilters : undefined);
       setShowForm(false);
     } catch (err) {
       throw err;
@@ -75,7 +86,7 @@ export default function Home() {
   const handleUpdateTask = async (id: number, task: Omit<Task, "id">) => {
     try {
       await ApiClient.updateTask(id, task);
-      await loadTasks();
+      await loadTasks(Object.keys(activeFilters).length > 0 ? activeFilters : undefined);
       setEditingTask(null);
     } catch (err) {
       throw err;
@@ -85,7 +96,7 @@ export default function Home() {
   const handleDeleteTask = async (id: number) => {
     try {
       await ApiClient.deleteTask(id);
-      await loadTasks();
+      await loadTasks(Object.keys(activeFilters).length > 0 ? activeFilters : undefined);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete task");
     }
@@ -136,6 +147,11 @@ export default function Home() {
             </div>
           </div>
         )}
+
+        {/* Search and Filter */}
+        <div className="mb-6">
+          <SearchFilter onSearch={handleSearch} />
+        </div>
 
         {/* Controls */}
         <div className="mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md">
