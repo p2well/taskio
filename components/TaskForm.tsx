@@ -31,6 +31,10 @@ export default function TaskForm({ initialTask, onSubmit, onCancel }: TaskFormPr
       newErrors.description = "Description must not exceed 500 characters";
     }
 
+    if (!dueDate) {
+      newErrors.dueDate = "Due date is required";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -46,7 +50,7 @@ export default function TaskForm({ initialTask, onSubmit, onCancel }: TaskFormPr
         title: title.trim(),
         description: description.trim() || undefined,
         status,
-        dueDate: dueDate || undefined,
+        dueDate,
       });
       
       // Reset form if creating new task
@@ -121,14 +125,17 @@ export default function TaskForm({ initialTask, onSubmit, onCancel }: TaskFormPr
 
       <div>
         <label htmlFor="dueDate" className="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
-          Due Date
+          Due Date <span className="text-red-600 dark:text-red-400">*</span>
         </label>
         <LocalizedDatePicker
           id="dueDate"
           value={dueDate}
           onChange={setDueDate}
-          className="w-full px-4 py-3 text-gray-900 dark:text-gray-100 text-base font-medium border-2 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-500 focus:border-purple-500 hover:bg-white dark:hover:bg-gray-600 hover:border-purple-300 dark:hover:border-purple-500 transition-all cursor-pointer"
+          className={`w-full px-4 py-3 text-gray-900 dark:text-gray-100 text-base font-medium border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-500 focus:border-purple-500 transition-all cursor-pointer ${
+            errors.dueDate ? "border-red-400 bg-red-50 dark:bg-red-900/20" : "border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 hover:bg-white dark:hover:bg-gray-600 hover:border-purple-300 dark:hover:border-purple-500"
+          }`}
         />
+        {errors.dueDate && <p className="mt-2 text-sm text-red-600 font-medium">{errors.dueDate}</p>}
       </div>
 
       {errors.submit && (
