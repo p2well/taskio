@@ -31,9 +31,8 @@ export default function TaskForm({ initialTask, onSubmit, onCancel }: TaskFormPr
       newErrors.description = "Description must not exceed 500 characters";
     }
 
-    if (!dueDate) {
-      newErrors.dueDate = "Due date is required";
-    }
+    // Note: Due date validation is handled by the DatePicker component
+    // It prevents invalid dates from being selected
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -50,7 +49,7 @@ export default function TaskForm({ initialTask, onSubmit, onCancel }: TaskFormPr
         title: title.trim(),
         description: description.trim() || undefined,
         status,
-        dueDate,
+        dueDate: dueDate || undefined,
       });
       
       // Reset form if creating new task
@@ -125,7 +124,7 @@ export default function TaskForm({ initialTask, onSubmit, onCancel }: TaskFormPr
 
       <div>
         <label htmlFor="dueDate" className="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
-          Due Date <span className="text-red-600 dark:text-red-400">*</span>
+          Due Date
         </label>
         <LocalizedDatePicker
           id="dueDate"
